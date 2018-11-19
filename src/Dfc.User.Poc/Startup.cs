@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Dfc.User.Poc.Areas.Identity.Data;
 using Microsoft.Extensions.Logging;
 
+
 namespace Dfc.User.Poc
 {
     public class Startup
@@ -38,11 +39,20 @@ namespace Dfc.User.Poc
             });
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddIdentity<DfcUserPocUser, IdentityRole>()
-           // services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                
+                
+            services.AddIdentity<DfcUserPocUser, IdentityRole>(options => {
+                //options.Tokens.ProviderMap.Add("Default", new TokenProviderDescriptor(typeof(IUserTwoFactorTokenProvider<DfcUserPocUser>)));
+            }).AddEntityFrameworkStores<ApplicationDbContext>();
+
+            //services.Configure<DataProtectionTokenProviderOptions>(o =>
+            //{
+            //    o.Name = "Default";
+            //    o.TokenLifespan = TimeSpan.FromHours(1);
+            //});
+            // services.AddDefaultIdentity<IdentityUser>()
+
             services.AddScoped<SignInManager<DfcUserPocUser>, SignInManager<DfcUserPocUser>>();
 
 
