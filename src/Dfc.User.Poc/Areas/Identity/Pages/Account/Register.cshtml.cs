@@ -67,7 +67,7 @@ namespace Dfc.User.Poc.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = new DfcUserPocUser { UserName = Input.UserName, Email = Input.UserName };
-                var checkUser = await _userManager.FindByNameAsync(userName: Input.UserName);
+               
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
@@ -83,7 +83,8 @@ namespace Dfc.User.Poc.Areas.Identity.Pages.Account
                     await _emailSender.SendEmailAsync(Input.UserName, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    //Prevent sign in before confirming email address
+                    //await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }
                 foreach (var error in result.Errors)

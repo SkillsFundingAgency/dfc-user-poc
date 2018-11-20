@@ -15,13 +15,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Dfc.User.Poc.Areas.Identity.Data;
 using Microsoft.Extensions.Logging;
-
+using System.Data.SqlClient;
+using Dfc.User.Poc.Services;
 
 namespace Dfc.User.Poc
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+       
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
             Configuration = configuration;
         }
@@ -43,8 +46,10 @@ namespace Dfc.User.Poc
                 
                 
             services.AddIdentity<DfcUserPocUser, IdentityRole>(options => {
-                //options.Tokens.ProviderMap.Add("Default", new TokenProviderDescriptor(typeof(IUserTwoFactorTokenProvider<DfcUserPocUser>)));
-            }).AddEntityFrameworkStores<ApplicationDbContext>();
+                options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
+                options.SignIn.RequireConfirmedEmail = true;
+            })  .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             //services.Configure<DataProtectionTokenProviderOptions>(o =>
             //{
@@ -104,6 +109,7 @@ namespace Dfc.User.Poc
 
             // using Microsoft.AspNetCore.Identity.UI.Services;
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -113,7 +119,7 @@ namespace Dfc.User.Poc
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseDatabaseErrorPage();    
             }
             else
             {
@@ -122,6 +128,7 @@ namespace Dfc.User.Poc
             }
 
             var context = serviceProvider.GetService<Data.ApplicationDbContext>();
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -134,6 +141,7 @@ namespace Dfc.User.Poc
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }
